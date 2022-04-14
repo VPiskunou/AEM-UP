@@ -6,7 +6,7 @@ AEM Author, Publisher and Dispatcher in one VM With a logging server\*. managed 
 
 > *This VM runs a [tailon](https://github.com/gvalkov/tailon) server to show you logs in browser! no SSH necessary!
 
-TL;DR: 
+TL;DR:
 
 ## Table of Contents
   * [Stack:](#stack)
@@ -41,19 +41,19 @@ TL;DR:
 - `vagrant 2.1.5` or higher [Install Vagrant](https://www.vagrantup.com/docs/installation/)
 - `Ansible 2.7` or higher  [Install Ansible](http://docs.ansible.com/ansible/intro_installation.html)
 - AEM JAR and license.
-- Latest Dispatcher module*. 
+- Latest Dispatcher module*.
 
 > *Download from [PackageShare](https://www.adobeaemcloud.com/content/companies/public/adobe/dispatcher/dispatcher.html). choose `Linux x86 64bit` for example: `dispatcher-apache2.4-linux-x86-64-4.2.3.tar.gz`
 
 ## Setup
 
 1. **Add AEM JAR, license and dispatcher module:**
-	
+
 	copy your `cq-quickstart-<version>.jar`, `license.properties` and `dispatcher-apache2.4-<version>.so` to `user-provided` folder.
 	> Pay close attention to step 2
 
   Folder structure should look something like this:
-  
+
   ```
 	.
 	├── LICENSE.md
@@ -87,11 +87,11 @@ TL;DR:
 3. **Run VM**
 
 	On Mac? use `./vm up`. see the VM script below.
-	
+
 	Not on Mac? run `vagrant up`
-	
+
 	> This VM binds no non-standard ports (46##), see [Default Ports](#default-ports) below. This can be changed: read [Configuration](#configuration) section below.
-	
+
 	> HELP: If you have experience converting bash scripts to windows, I could use the help to convert `vm` script.
 
 4. **buy me coffee? JK, just star the repo :)**
@@ -107,12 +107,12 @@ TL;DR:
 You can do this in the `Vagrantfile`. There is a `port forwarding`. You may se entries like:
 
 ```ruby
-# Ports Forwarding  
+# Ports Forwarding
 config.vm.network "forwarded_port", guest: 4602, host: 4602
 config.vm.network "forwarded_port", guest: 4603, host: 4603
 config.vm.network "forwarded_port", guest: 80, host: 4604
 config.vm.network "forwarded_port", guest: 8080, host: 4605
-``` 
+```
 
 leave `guest` ports untouched, and change `host` ports to your heart's content!
 
@@ -143,21 +143,21 @@ ANSIBLE_ARGS='--tags "aem_dispatcher"' vagrant provision
 in `vagrantfile` change `vb.memory` and `vb.cpu`
 
 ### JVM/AEM parameters
-  
+
   You can set Java and AEM params in `Environment` directive in `services/aem-author.service` and `services/aem-publish.service`
 
 
 ### Ansible extra arguments (Mac/Linux only)
   You can pass extra arguments to Ansible as part of the `vagrant provision` command by setting the params to the environment variable `ANSIBLE_ARGS`.
-  
+
   > HELP: need to know how to do this on windows.
-  
-  for example: 
-  
+
+  for example:
+
   ```
   ANSIBLE_ARGS='--tags "aem_dispatcher"' vagrant provision
   ```
-  
+
   passes `--tags "aem_dispatcher"` to ansible, to run tasks with tag `aem_dispatcher`
 
 

@@ -3,10 +3,10 @@
 
   vars:
     # CONFIGURE THIS:
-    aem_jar_name: "cq-quickstart-6.4.0.jar" # The AEM JAR file name in /user-provided
+    aem_jar_name: "cq-quickstart-6.5.0.jar" # The AEM JAR file name in /user-provided
     # The dispatcher module file name in /user-provided.
     # Make sure you have the uncompressed `.so` file in /user-provided (not the zipped `.gz` file)
-    dispatcher_module_name: "dispatcher-apache2.4-4.2.3.so"
+    dispatcher_module_name: "dispatcher-apache2.4-4.3.5.so"
     aem_publish_runmodes: publish,samplecontent
     aem_author_runmodes: author,samplecontent
 
@@ -15,7 +15,7 @@
     aem_author_port: 4602
     aem_publish_port: 4603
     aem_dispatcher_port: 4604
-    
+
     # Configurations that may or may not need to be modified somewhere else :)
     # Absolute paths to AEM folders on the VM
     author_folder: /home/vagrant/aem-author
@@ -30,7 +30,6 @@
       service: name=httpd state=restarted
   # Ansible tasks
   tasks:
-
     # CAUTION: ONLY FOR LOCAL DEV BOX, ***DO NOT*** USE THIS FOR PRODUCTION :)
     # Solves for the issue of "Permission denied" when running dispatcher, even as root.
     # for adobe's solution, see section "Apache Web Server - Configure SELinux Properties"
@@ -39,7 +38,7 @@
     - name: Disable SELinux
       selinux: state=disabled
       register: disable_selinux_result
-    
+
     # Reboot ONLY if Disable SELinux task was changed (only first time)
     - name: Restarting VM (only runs when SELinux task is changed)
       shell: "sleep 5 && reboot"
@@ -76,7 +75,7 @@
         creates: "{{item.folder}}/crx-quickstart"
       with_items:
         - { folder: "{{publish_folder}}", runmode: "{{aem_publish_runmodes}}" }
-        - { folder: "{{author_folder}}",  runmode: "{{aem_author_runmodes}}" }
+        - { folder: "{{author_folder}}", runmode: "{{aem_author_runmodes}}" }
 
     - name: Copy license file to author and publish locations
       command: cp {{user_provided_folder}}/license.properties {{item}}
@@ -85,9 +84,8 @@
         creates: "{{item}}/license.properties"
       with_items: ["{{publish_folder}}", "{{author_folder}}"]
 
-
     - name: Install systemd service for Author and Publish
-      template: 
+      template:
         src: services/{{item}}.service
         dest: /usr/lib/systemd/system/{{item}}.service
         mode: u=rwx,g=rwx,o=rwx # dev box, remember :)
@@ -99,26 +97,28 @@
       poll: 10
       with_items: [aem-publish, aem-author]
 
-
     - name: Copy dispatcher module to apache
       tags: aem_dispatcher
       copy: src="user-provided/{{dispatcher_module_name}}" dest="/etc/httpd/modules/mod_dispatcher.so"
       notify:
         - restart apache
 
-    # here, we copy 
+    # here, we copy
     - name: Configure Dispatcher
       tags: aem_dispatcher
-      template: 
+      template:
         src: dispatcher/{{item.name}}
         dest: /etc/httpd/{{item.rePath}}
         # mode: u=rwx,g=rwx,o=rwx # dev box, remember :)
       notify:
         - restart apache
       with_items:
-        - { name: 00-dispatcher.conf, rePath: conf.modules.d/00-dispatcher.conf }
-        - { name: dispatcher.conf,    rePath: conf.d/dispatcher.conf }
-        - { name: dispatcher.any,     rePath: conf/dispatcher.any    }
+        - {
+            name: 00-dispatcher.conf,
+            rePath: conf.modules.d/00-dispatcher.conf,
+          }
+        - { name: dispatcher.conf, rePath: conf.d/dispatcher.conf }
+        - { name: dispatcher.any, rePath: conf/dispatcher.any }
 
     - name: Waiting for AEM author to bind to port
       tags: aem_author
@@ -130,14 +130,14 @@
     - name: Install tailon
       tags: tailon
       copy: src="binaries/tailon/tailon" dest="/usr/bin/tailon"
-    
+
     - name: Install systemd service for Tailon
       tags: tailon
-      template: 
+      template:
         src: services/tailon.service
         dest: /usr/lib/systemd/system/tailon.service
         mode: u=rwx,g=rwx,o=rwx # dev box, remember :)
-    
+
     - name: Changing perm of "/usr/bin/tailon", adding "+x"
       tags: tailon
       file: dest=/usr/bin/tailon mode=01777 # dev box, remember :)

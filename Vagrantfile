@@ -20,7 +20,7 @@ Vagrant.configure(2) do |config|
         vb.memory = "5000"
         vb.cpus = 2
     end
-    
+
     # Disable default rsync folder and setup new one
     config.vm.synced_folder ".", "/vagrant", disabled: true
     config.vm.synced_folder "./user-provided", "/home/vagrant/user-provided", disabled: false, type: "rsync", create: true
@@ -31,7 +31,7 @@ Vagrant.configure(2) do |config|
     # Creates host-only static ip address on the machine's private network
     config.vm.network "private_network", ip: "192.168.99.44"
 
-    # Ports Forwarding  
+    # Ports Forwarding
     config.vm.network "forwarded_port", guest: 4602, host: 4602
     config.vm.network "forwarded_port", guest: 4603, host: 4603
     config.vm.network "forwarded_port", guest: 80, host: 4604
