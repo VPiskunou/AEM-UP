@@ -29,13 +29,13 @@ Vagrant.configure(2) do |config|
     # config.vm.synced_folder "./instances", "/home/vagrant", type: "nfs", disabled: false
 
     # Creates host-only static ip address on the machine's private network
-    config.vm.network "private_network", ip: "192.168.99.44"
+    config.vm.network "private_network", ip: "192.168.56.2"
 
     # Ports Forwarding
-    config.vm.network "forwarded_port", guest: 4602, host: 4602
-    config.vm.network "forwarded_port", guest: 4603, host: 4603
-    config.vm.network "forwarded_port", guest: 80, host: 4604
-    config.vm.network "forwarded_port", guest: 8080, host: 4605
+    config.vm.network "forwarded_port", guest: 4602, host: 4602, auto_correct: true
+    config.vm.network "forwarded_port", guest: 4603, host: 4603, auto_correct: true
+    config.vm.network "forwarded_port", guest: 80, host: 4604, auto_correct: true
+    config.vm.network "forwarded_port", guest: 8080, host: 4605, auto_correct: true
 
     # Run ansible playbook
     config.vm.provision "ansible" do |ansible|
